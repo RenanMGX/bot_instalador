@@ -2,28 +2,40 @@ import os
 import subprocess
 import threading
 import queue
-for i in range(2):
-    try:
-        from kivy.uix.boxlayout import BoxLayout
-        from kivy.uix.button import Button
-        from kivy.uix.checkbox import CheckBox
-        from kivy.uix.label import Label
-        from kivy.uix.scrollview import ScrollView
-        from kivy.app import App
-        from kivy.core.window import Window
-        import tkinter as tk
-        from tkinter import ttk
-        import shutil
-        import time
-        import winreg
-    except:
-        os.system("pip install pip")
-        os.system("pip install app")
-        os.system("pip install kivy")
-        os.system("pip install winreg")
-        os.system("pip install tk")
-        os.system("pip install shutil")
-        os.system("pip install kivy[base] kivy_examples --pre --extra-index-url https://kivy.org/downloads/simple/")
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.uix.checkbox import CheckBox
+from kivy.uix.label import Label
+from kivy.uix.scrollview import ScrollView
+from kivy.app import App
+from kivy.core.window import Window
+import tkinter as tk
+from tkinter import ttk
+import shutil
+import time
+import winreg
+# for i in range(2):
+#     try:
+#         from kivy.uix.boxlayout import BoxLayout
+#         from kivy.uix.button import Button
+#         from kivy.uix.checkbox import CheckBox
+#         from kivy.uix.label import Label
+#         from kivy.uix.scrollview import ScrollView
+#         from kivy.app import App
+#         from kivy.core.window import Window
+#         import tkinter as tk
+#         from tkinter import ttk
+#         import shutil
+#         import time
+#         import winreg
+#     except:
+#         os.system("pip install pip --upgrade")
+#         os.system("pip install app")
+#         os.system("pip install kivy")
+#         os.system("pip install winreg")
+#         os.system("pip install tk")
+#         os.system("pip install shutil")
+#         os.system("pip install kivy[base] kivy_examples --pre --extra-index-url https://kivy.org/downloads/simple/")
 #função para instalação de algum programa utilizando subprocess.popen
 def install_popen(path):
     install = subprocess.Popen(path, shell=True)
@@ -105,15 +117,26 @@ def drive_hp_g8_250():
     intall_run(path[0])
     intall_run(path[0])
     Window.restore()
+def project():
+    path = "\\\\patrimar089\\e$\\Programas\\Outros\\Office\\MS Project\\MSProject_ptbr_64bits.exe"
+    intall_run(path)
+    Window.restore()
+def adap_wifi():
+    path = "\\\\patrimar089\\e$\\Programas\\Outros\\Drivers\\Adaptador Wifi\\DWA-131_E1_V5.11b03\\Setup.exe"
+    intall_run(path)
+    Window.restore()
+
 #variavel com o nome das opçoes
 items_lista = [
-"Instalar Programas Padrões", 
+"Instalar Programas Padrões",
+"Driver Adaptador WIFI", 
 "SAP 770", 
 "Open VPN", 
 "Office 2016", 
 "Office 365", 
 "Visualizador Sketchup 2022", 
-"Drive Video e Audio do HP G8 250 *Carregamento Demorado*"
+"Drive Video e Audio do HP G8 250 *Carregamento Demorado*",
+"Project",
 ] 
 #interface em Kivy    
 class InstallerApp(App):
@@ -166,6 +189,12 @@ class InstallerApp(App):
                 elif item == "Drive Video e Audio do HP G8 250 *Carregamento Demorado*":
                     drive_hp_g8_250()
                     print("Drive Video e Audio do HP G8 250 sendo executado")
+                elif item == "Project":
+                    project()
+                    print("Project sendo executado")
+                elif item == "Driver Adaptador WIFI":
+                    adap_wifi()
+                    print("Driver Adaptador WIFI sendo executado")
 
 if __name__ == '__main__':
     InstallerApp().run()
