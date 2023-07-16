@@ -1,46 +1,17 @@
-import os
-import subprocess
-import threading
-import queue
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.checkbox import CheckBox
-from kivy.uix.label import Label
-from kivy.uix.scrollview import ScrollView
-from kivy.app import App
-from kivy.core.window import Window
-import tkinter as tk
-from tkinter import ttk
 import shutil
 import time
-import winreg
-# for i in range(2):
-#     try:
-#         from kivy.uix.boxlayout import BoxLayout
-#         from kivy.uix.button import Button
-#         from kivy.uix.checkbox import CheckBox
-#         from kivy.uix.label import Label
-#         from kivy.uix.scrollview import ScrollView
-#         from kivy.app import App
-#         from kivy.core.window import Window
-#         import tkinter as tk
-#         from tkinter import ttk
-#         import shutil
-#         import time
-#         import winreg
-#     except:
-#         os.system("pip install pip --upgrade")
-#         os.system("pip install app")
-#         os.system("pip install kivy")
-#         os.system("pip install winreg")
-#         os.system("pip install tk")
-#         os.system("pip install shutil")
-#         os.system("pip install kivy[base] kivy_examples --pre --extra-index-url https://kivy.org/downloads/simple/")
-#função para instalação de algum programa utilizando subprocess.popen
+import subprocess
+import sys
+from time import sleep
+from PyQt6.QtWidgets import (QApplication, QCheckBox, QDialog, QPushButton, 
+QStyleFactory, QVBoxLayout, QMainWindow, QLabel)
+
+# funcoes para instalar os softwares
 def install_popen(path):
     install = subprocess.Popen(path, shell=True)
     while install.poll() is None:
         time.sleep(1)
+    return True
 def intall_run(path):
     command = None
     if type(path) == list:
@@ -49,9 +20,11 @@ def intall_run(path):
         command = path
     try:
         result = subprocess.run(command, shell=True)
-        veri_program(result)
-    except:
+       #veri_program(result)
+        return True
+    except PermissionError:
         print("sem permissão")
+        return False
 #verificar instalação
 def veri_program(result):
     if result.returncode == 0:
@@ -63,138 +36,203 @@ def veri_program(result):
     else:
         print("A instalação falhou com código de erro:", result.returncode)
 # Função para a instalação do winrar
-def padronizar():
-    original_file = "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\readerdc64_br_l_cra_mdr_install.exe"
-    copy_file = "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\adobe_reader.exe"
-    shutil.copy(original_file, copy_file)
-    path = ["\\\\patrimar089\\e$\\Programas\\Outros\\winrar\\winrar-x64-620br.exe",
-            "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\adobe_reader.exe",
-            "\\\\patrimar089\\e$\\Programas\\Outros\\Chrome\\ChromeSetup.exe"
-    ]
-    install_popen(path[2])
-    intall_run([path[0], "/S"])
-    intall_run([path[1], "/quiet"])
-    Window.restore()
-# Função para a instalação do sap_770
-def sap_770():
-    path = "\\\\patrimar089\\e$\\\Programas\\\Outros\\\SAP_770\\SetupAll.exe"
-    intall_run(path)
-    Window.restore()
-# Função para a instalação do open_vpn
-def open_vpn():
-    path = "\\\\patrimar089\\e$\\Programas\\Outros\\VPN\\Open VPN\\OpenVPN-2.5.1-I601-amd64.msi"
-    intall_run([path, "/passive"])
-    original_file = "\\\\patrimar089\\e$\\Programas\\Outros\\Open_VPN\\nao_mexer\\Patrimar.ovpn"
-    copy_file = "C:\\Users\\Public\\Downloads\\Patrimar.ovpn"
-    shutil.copy(original_file, copy_file)
-    copy_file2 = "C:\Program Files\OpenVPN\config\Patrimar.ovpn"
-    command = f'powershell -Command "Start-Process cmd -ArgumentList \'/C, copy {original_file} {copy_file2} /y\' -Verb runAs"'
-    subprocess.run(command, shell=True)
-    shutil.copy(copy_file, copy_file2)
-    Window.restore()
-# Função para a instalação do office_2016
-def office_2016():
-    path = ["\\\\patrimar089\\e$\\Programas\\Outros\\Office\\2016 office\\Office - 2016 - Standard\\setup.exe",
-            "\\\\patrimar089\\e$\\Programas\\Outros\\Office\\2016 office\\Atualização outlook 2016\\outlook2016-kb4011123-fullfile-x64-glb.exe"
-    ]
-    intall_run(path[0])
-    intall_run([path[1], "/quiet"])
-    Window.restore()
-# Função para a instalação do office_365
-def office_365():
-    path = "\\\\patrimar089\\e$\\Programas\\Outros\\Office\\365 on-line\\Office365 64bit Setup.exe"
-    intall_run(path)
-    Window.restore()
-# Função para a instalação do visualizador_sketchup   
-def visualizador_sketchup():
-    path = "\\\\patrimar089\\e$\\Programas\\Outros\\Sketchup 2022\\Sketchup Visualizador\\SketchUpViewer-2022-0-354-126.exe"
-    intall_run([path, "/silent"])
-    Window.restore()
-def drive_hp_g8_250():
-    path = ["\\\\patrimar089\\e$\\Programas\\Outros\\drive_hp_g8_250\\audio.exe",
-            "\\\\patrimar089\\e$\\Programas\\Outros\\drive_hp_g8_250\\video.exe"
-    ]
-    intall_run(path[0])
-    intall_run(path[0])
-    Window.restore()
-def project():
-    path = "\\\\patrimar089\\e$\\Programas\\Outros\\Office\\MS Project\\MSProject_ptbr_64bits.exe"
-    intall_run(path)
-    Window.restore()
-def adap_wifi():
-    path = "\\\\patrimar089\\e$\\Programas\\Outros\\Drivers\\Adaptador Wifi\\DWA-131_E1_V5.11b03\\Setup.exe"
-    intall_run(path)
-    Window.restore()
+def instalar_programas(parametro):
+    # Função para a instalação dos programas padrões Adobe Reader, Winrar, Google Chrome
+    if parametro == "padrao":
+        original_file = "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\readerdc64_br_l_cra_mdr_install.exe"
+        copy_file = "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\adobe_reader.exe"
+        shutil.copy(original_file, copy_file)
+        path = ["\\\\patrimar089\\e$\\Programas\\Outros\\winrar\\winrar-x64-620br.exe",
+                "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\adobe_reader.exe",
+                "\\\\patrimar089\\e$\\Programas\\Outros\\Chrome\\ChromeSetup.exe"
+        ]
+        install_popen(path[2])
+        intall_run([path[0], "/S"])
+        return intall_run([path[1], "/quiet"])
+    # Função para a instalação do sap_770
+    if parametro == "sap770":
+        path = "\\\\patrimar089\\e$\\\Programas\\\Outros\\\SAP_770\\SetupAll.exe"
+        return intall_run(path)
+    # Função para a instalação do open_vpn
+    if parametro == "open_vpn":
+        path = "\\\\patrimar089\\e$\\Programas\\Outros\\VPN\\Open VPN\\OpenVPN-2.5.1-I601-amd64.msi"
+        retorno = intall_run([path, "/passive"])
+        try:
+            original_file = "\\\\patrimar089\\e$\\Programas\\Outros\\Open_VPN\\nao_mexer\\Patrimar.ovpn"
+            copy_file = "C:\\Users\\Public\\Downloads\\Patrimar.ovpn"
+            shutil.copy(original_file, copy_file)
+            copy_file2 = "C:\Program Files\OpenVPN\config\Patrimar.ovpn"
+            command = f'powershell -Command "Start-Process cmd -ArgumentList \'/C, copy {copy_file} {copy_file2} /y\' -Verb runAs"'
+            subprocess.run(command, shell=True)
+            shutil.copy(copy_file, copy_file2)
+            print("arquivo copiado")
+        except Exception as error:
+            print(f"open vpn error: {error}")
+        return  retorno
+    # Função para a instalação do office_2016
+    if parametro == "office_2016":
+        path = ["\\\\patrimar089\\e$\\Programas\\Outros\\Office\\2016 office\\Office - 2016 - Standard\\setup.exe",
+                "\\\\patrimar089\\e$\\Programas\\Outros\\Office\\2016 office\\Atualização outlook 2016\\outlook2016-kb4011123-fullfile-x64-glb.exe"
+        ]
+        intall_run(path[0])
+        return intall_run([path[1], "/quiet"])
+    # Função para a instalação do office_365
+    if parametro == "office365":
+        path = "\\\\patrimar089\\e$\\Programas\\Outros\\Office\\365 on-line\\Office365 64bit Setup.exe"
+        return intall_run(path)
+    # Função para a instalação do visualizador_sketchup   
+    if parametro == "sketchup_viewer_2022":
+        path = "\\\\patrimar089\\e$\\Programas\\Outros\\Sketchup 2022\\Sketchup Visualizador\\SketchUpViewer-2022-0-354-126.exe"
+        return intall_run([path, "/silent"])
+    # Função para a instalação do para os drivers da HP  
+    if parametro == "driver_hp":
+        path = ["\\\\patrimar089\\e$\\Programas\\Outros\\drive_hp_g8_250\\audio.exe",
+                "\\\\patrimar089\\e$\\Programas\\Outros\\drive_hp_g8_250\\video.exe"
+        ]
+        intall_run(path[0])
+        return intall_run(path[0])
+    # Função para a instalação do Project
+    if parametro == "project":
+        path = "\\\\patrimar089\\e$\\Programas\\Outros\\Office\\MS Project\\MSProject_ptbr_64bits.exe"
+        return intall_run(path)
+        # Função para a instalação do para o adaptador WIFI
+    if parametro == "driver_wifi":
+        path = "\\\\patrimar089\\e$\\Programas\\Outros\\Drivers\\Adaptador Wifi\\DWA-131_E1_V5.11b03\\Setup.exe"
+        return intall_run(path)
+    if parametro == "test":
+        sleep(1)
+        print("testando")
+    if parametro == "totvs":
+        print("test")
+    else:
+        return "não encontrado"
 
-#variavel com o nome das opçoes
-items_lista = [
-"Instalar Programas Padrões",
-"Driver Adaptador WIFI", 
-"SAP 770", 
-"Open VPN", 
-"Office 2016", 
-"Office 365", 
-"Visualizador Sketchup 2022", 
-"Drive Video e Audio do HP G8 250 *Carregamento Demorado*",
-"Project",
-] 
-#interface em Kivy    
-class InstallerApp(App):
-    def build(self):
-        root = BoxLayout(orientation='vertical')
-        self.items = items_lista
-        self.checkboxes = {}
-        scroll = ScrollView()
-        container = BoxLayout(orientation='vertical', size_hint_y=None)
-        container.bind(minimum_height=container.setter('height'))
-        for item in self.items:
-            item_box = BoxLayout(size_hint_y=None, height=30, padding=5)
-            label = Label(text=item, size_hint_x=0.8)
-            checkbox = CheckBox(size_hint_x=0.2)
-            self.checkboxes[item] = checkbox
-            item_box.add_widget(label)
-            item_box.add_widget(checkbox)
-            container.add_widget(item_box)
-        scroll.add_widget(container)
-        root.add_widget(scroll)
-        install_button = Button(text="Instalar", size_hint_y=None, height=40, on_press=self.exec)
-        root.add_widget(install_button)
-        return root
-    def exec(self, instance):
-        # Window.minimize()
-        self.install()
-        # Window.restore()
-    def install(self):
-        for item, checkbox in self.checkboxes.items():
-            if checkbox.active:
-                Window.minimize()
-                if item == "Instalar Programas Padrões":
-                    print("Programas Padrões sendo executado")
-                    padronizar()
-                elif item == "SAP 770":
-                    print("SAP 770 sendo executado")
-                    sap_770()
-                elif item == "Open VPN":
-                    open_vpn()
-                    print("Open VPN sendo executado")
-                elif item == "Office 2016":
-                    office_2016()
-                    print("Office 2016 sendo executado")
-                elif item == "Office 365":
-                    office_365()
-                    print("Office 365 sendo executado")
-                elif item == "Visualizador Sketchup":
-                    visualizador_sketchup()
-                    print("Visualizador Sketchup sendo executado")
-                elif item == "Drive Video e Audio do HP G8 250 *Carregamento Demorado*":
-                    drive_hp_g8_250()
-                    print("Drive Video e Audio do HP G8 250 sendo executado")
-                elif item == "Project":
-                    project()
-                    print("Project sendo executado")
-                elif item == "Driver Adaptador WIFI":
-                    adap_wifi()
-                    print("Driver Adaptador WIFI sendo executado")
+# classe do instalador
+class Interface(QDialog,QMainWindow):
+    def __init__(self, parent=None):
+        super(Interface, self).__init__(parent)
+        #titulo do Programa
+        self.setWindowTitle("Instalado de Programas Automatico")
+        #define o layout para Fusion
+        self.changeStyle('Fusion')   
+        #tamanho minimo da janela
+        self.setGeometry(300, 300, 600, 150)
+        #lista de programa para instalar salvos em dicionario chave =  parametro para ser instalado, valor =  nome do programa que será exibido para o usuario
+        self.programas = {
+            "padrao":"Programas Padrão", 
+            "driver_wifi":"Driver para Adaptador WIFI", 
+            "sap770": "SAP Versão 770", 
+            "open_vpn": "Open VPN", 
+            "office_2016": "Office 2016 Escritorio", 
+            "office365" : "Office 365", 
+            "sketchup_viewer_2022" : "Visualizador do Sketchup 2022", 
+            "driver_hp": "Drive Video e Audio do HP G8 250 *Carregamento Demorado*", 
+            "project" : "Project", 
+            "test": "test"
+        }
+        self.programas2 = {
+            "totvs": "Instalar TOTVS"
+        }
+        #cria uma lista para salvar cada programa em uma check box
+        self.checkBox = []
+        for chave,valor in self.programas.items():
+            self.checkBox.append(QCheckBox(valor))
+        self.checkBox2 = []
+        for chave,valor in self.programas2.items():
+            self.checkBox2.append(QCheckBox(valor))
 
+        self.paginas = 1
+
+        #botão instalar com uma chamada para o metodo executar()
+        botao = QPushButton('Instalar')
+        botao.setDefault(True)
+        botao.clicked.connect(self.executar)
+        self.texto = QLabel()
+
+        self.mudar_pagina = QPushButton('TOTVS')
+        self.mudar_pagina.setFlat(True)
+        self.mudar_pagina.clicked.connect(self.pagina)
+        self.mudar_pagina.setStyleSheet("QPushButton { text-align: Right; }")
+
+
+        #criando o designer definidos nas variaveis e instancias acima
+        layout = QVBoxLayout() 
+        for x in self.checkBox:
+            layout.addWidget(x)
+        for x in self.checkBox2:
+            layout.addWidget(x)
+        layout.addWidget(self.mudar_pagina)
+        layout.addWidget(botao)
+        layout.addWidget(self.texto)
+        self.setLayout(layout)
+
+        for x in self.checkBox2:
+            x.setVisible(False)
+
+    def pagina(self):
+        if self.paginas == 1:
+            for x in self.checkBox:
+                x.setVisible(False)
+                x.setChecked(False)
+            for x in self.checkBox2:
+                x.setVisible(True)
+                x.setChecked(False)
+            self.mudar_pagina.setText("Programas")
+            self.paginas = 2
+        elif self.paginas == 2:
+            for x in self.checkBox:
+                x.setVisible(True)
+                x.setChecked(False)
+            for x in self.checkBox2:
+                x.setVisible(False)
+                x.setChecked(False)
+            self.mudar_pagina.setText("TOTVS")
+            self.paginas = 1
+
+    #metodo para a o estilo Fusion
+    def changeStyle(self, styleName):
+        QApplication.setStyle(QStyleFactory.create(styleName))
+        QApplication.setPalette(QApplication.style().standardPalette())
+    # metodo que executara os programas que estiverem com a checkbox marcada
+    def executar(self):
+        contador = 0
+        instalados = []
+        errors = []
+        procurando = []
+        self.programas.update(self.programas2)
+        self.checkBox.extend(self.checkBox2)
+        #descarregando todos os comandos do dicionario 'programas' e validando qual está com a checkbox marcada e vai listar qual programa teve exito ao instalar e qual deu error
+        for chave,programa in self.programas.items():
+            procurando.append(self.checkBox[contador].isChecked())
+            if self.checkBox[contador].isChecked():
+                print(f"instalação do '{programa}' iniciada")
+                gallery.showMinimized()
+                try:
+                    verificar = instalar_programas(chave)
+                    print(f"instalação do '{programa}' encerrada")
+                    if verificar == True:
+                        instalados.append(programa)
+                    else:
+                        errors.append(programa)
+                except PermissionError:
+                    print("Sem permissão para executar o arquivo")
+                    errors.append(programa)
+                except Exception as error:
+                    print(error)
+                    errors.append(programa)
+                gallery.showNormal()
+            contador += 1
+        #exibe quais programas instalaram e quais deram error
+        if True in procurando:
+            self.texto.setText(f"os seguintes programas foram instalados com exito! \n {str(instalados)[1:-1]} \n\n os seguintes pragamas não puderam ser instalados: \n{str(errors)[1:-1]}")
+        else:
+            self.texto.setText("Programa não Encontrado")
+
+#chamando a classe com o __main__
 if __name__ == '__main__':
-    InstallerApp().run()
+    instalado_semproblema = False
+    app = QApplication(sys.argv)
+    gallery = Interface()
+    gallery.show()
+    gallery.showNormal()
+    sys.exit(app.exec())
