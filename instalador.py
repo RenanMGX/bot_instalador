@@ -99,11 +99,6 @@ def instalar_programas(parametro):
     if parametro == "driver_wifi":
         path = "\\\\patrimar089\\e$\\Programas\\Outros\\Drivers\\Adaptador Wifi\\DWA-131_E1_V5.11b03\\Setup.exe"
         return intall_run(path)
-    if parametro == "test":
-        sleep(1)
-        print("testando")
-    if parametro == "totvs":
-        print("test")
     else:
         return "não encontrado"
 
@@ -128,7 +123,6 @@ class Interface(QDialog,QMainWindow):
             "sketchup_viewer_2022" : "Visualizador do Sketchup 2022", 
             "driver_hp": "Drive Video e Audio do HP G8 250 *Carregamento Demorado*", 
             "project" : "Project", 
-            "test": "test"
         }
         self.programas2 = {
             "totvs": "Instalar TOTVS"
@@ -149,10 +143,10 @@ class Interface(QDialog,QMainWindow):
         botao.clicked.connect(self.executar)
         self.texto = QLabel()
 
-        self.mudar_pagina = QPushButton('TOTVS')
-        self.mudar_pagina.setFlat(True)
-        self.mudar_pagina.clicked.connect(self.pagina)
-        self.mudar_pagina.setStyleSheet("QPushButton { text-align: Right; }")
+        # self.mudar_pagina = QPushButton('TOTVS')
+        # self.mudar_pagina.setFlat(True)
+        # self.mudar_pagina.clicked.connect(self.pagina)
+        # self.mudar_pagina.setStyleSheet("QPushButton { text-align: Right; }")
 
 
         #criando o designer definidos nas variaveis e instancias acima
@@ -161,7 +155,7 @@ class Interface(QDialog,QMainWindow):
             layout.addWidget(x)
         for x in self.checkBox2:
             layout.addWidget(x)
-        layout.addWidget(self.mudar_pagina)
+        # layout.addWidget(self.mudar_pagina)
         layout.addWidget(botao)
         layout.addWidget(self.texto)
         self.setLayout(layout)
