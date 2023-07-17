@@ -39,22 +39,27 @@ def trazer_programa_frente(programa):
 # funcoes para instalar os softwares
 def install_popen(path, clicar=None, programa=None, exept=None, cancel=None):
     install = subprocess.Popen(path, shell=True)
-    if isinstance(clicar, str):
-        clicar = [clicar]
-    etapa = 0
-    contador_finalizar = 0
-    verificar_janela = 0
-    while (install.poll() is None) or (etapa < len(clicar)):
-        if (etapa < len(clicar)) == False:
-            break
-        etapa += clicando(clicar[etapa],programa, exept, cancel)
-        contador_finalizar += 1
-        if contador_finalizar >= 25*60:
-            break
-        verificar_janela +=1
-        if verificar_janela >= 60:
-            trazer_programa_frente(programa)
-        time.sleep(1)
+    if clicar != None:
+        if isinstance(clicar, str):
+            clicar = [clicar]
+        etapa = 0
+        contador_finalizar = 0
+        verificar_janela = 0
+        while (install.poll() is None) or (etapa < len(clicar)):
+            if (etapa < len(clicar)) == False:
+                break
+            print(clicar[etapa])
+            etapa += clicando(clicar[etapa],programa, exept, cancel)
+            contador_finalizar += 1
+            if contador_finalizar >= 25*60:
+                break
+            verificar_janela +=1
+            if verificar_janela >= 60:
+                trazer_programa_frente(programa)
+            time.sleep(1)
+    else:
+        while (install.poll() is None):
+            time.sleep(1)
     return True
 def intall_run(path):
     command = None
@@ -146,6 +151,23 @@ def instalar_programas(parametro):
         path = "\\\\patrimar089\\e$\\Programas\\Outros\\Drivers\\Adaptador Wifi\\DWA-131_E1_V5.11b03\\Setup.exe"
         #return intall_run(path)
         return install_popen(path, clicar=[r"onde_clicar\bt_setup.PNG", r"onde_clicar\bt_complete.PNG"])
+    if parametro == "power_bi":
+        path = r"\\patrimar089\e$\Programas\Outros\Power BI\__power_bi__.exe"
+        return install_popen(path, programa="Instalação do Microsoft Power BI Desktop (x64)", 
+                             clicar=[r"onde_clicar\bt_power_avancar.PNG",
+                                     r"onde_clicar\distra_power.PNG",
+                                     r"onde_clicar\bt_power_avancar2.PNG",
+                                     r"onde_clicar\bt_power_aceitar.PNG",
+                                     r"onde_clicar\bt_power_avancar2.PNG",
+                                     r"onde_clicar\distra_power2.PNG",
+                                     r"onde_clicar\bt_power_avancar2.PNG",
+                                     r"onde_clicar\distra_power3.PNG",
+                                     r"onde_clicar\bt_power_instalar.PNG",
+                                     r"onde_clicar\distra_power4.PNG",
+                                     r"onde_clicar\bt_power_concluir.PNG",
+                                     ]
+                                     
+                                     )
     else:
         return "não encontrado"
 
@@ -170,7 +192,8 @@ class Interface(QDialog,QMainWindow):
             "office365" : "Office 365", 
             "sketchup_viewer_2022" : "Visualizador do Sketchup 2022", 
             "driver_hp": "Drive Video e Audio do HP G8 250 *Carregamento Demorado*", 
-            "project" : "Project", 
+            "project" : "Project",
+            "power_bi" : "Power BI", 
         }
         self.programas2 = {
             "totvs": "Instalar TOTVS"
