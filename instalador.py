@@ -1,3 +1,4 @@
+import os
 import shutil
 import time
 import subprocess
@@ -5,11 +6,54 @@ import sys
 from time import sleep
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QDialog, QPushButton, 
 QStyleFactory, QVBoxLayout, QMainWindow, QLabel)
+import pyautogui
+import pygetwindow as gw
+
+#cliando
+def clicando(img=None,programa=None, exept=None, cancel=None):
+    bt = pyautogui.locateOnScreen(img)
+    if bt != None:
+        print(bt)
+        pyautogui.click(bt)
+        return 1
+    elif exept != None:
+        if pyautogui.locateOnScreen(exept) != None:
+            print(exept)
+            if cancel != None:
+                if pyautogui.locateOnScreen(cancel) != None:
+                    print(cancel)
+                    pyautogui.click(cancel)
+                    return 999
+    return 0
+#função para trazer um programa para frente de todos os programas ele vai procurar o programa pelo nome dele no gerenciador de tarefas
+def trazer_programa_frente(programa):
+    try:
+        window = gw.getWindowsWithTitle(programa)[0]
+        window.activate()
+        window.maximize()
+        window.restore()
+        pyautogui.click(window.left + 10, window.top + 10)
+    except IndexError:
+        print(f"Janela do {programa} não encontrada!")
 
 # funcoes para instalar os softwares
-def install_popen(path):
+def install_popen(path, clicar=None, programa=None, exept=None, cancel=None):
     install = subprocess.Popen(path, shell=True)
-    while install.poll() is None:
+    if isinstance(clicar, str):
+        clicar = [clicar]
+    etapa = 0
+    contador_finalizar = 0
+    verificar_janela = 0
+    while (install.poll() is None) or (etapa < len(clicar)):
+        if (etapa < len(clicar)) == False:
+            break
+        etapa += clicando(clicar[etapa],programa, exept, cancel)
+        contador_finalizar += 1
+        if contador_finalizar >= 25*60:
+            break
+        verificar_janela +=1
+        if verificar_janela >= 60:
+            trazer_programa_frente(programa)
         time.sleep(1)
     return True
 def intall_run(path):
@@ -19,7 +63,7 @@ def intall_run(path):
     else:
         command = path
     try:
-        result = subprocess.run(command, shell=True)
+        subprocess.run(command, shell=True)
        #veri_program(result)
         return True
     except PermissionError:
@@ -39,20 +83,22 @@ def veri_program(result):
 def instalar_programas(parametro):
     # Função para a instalação dos programas padrões Adobe Reader, Winrar, Google Chrome
     if parametro == "padrao":
-        original_file = "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\readerdc64_br_l_cra_mdr_install.exe"
-        copy_file = "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\adobe_reader.exe"
-        shutil.copy(original_file, copy_file)
         path = ["\\\\patrimar089\\e$\\Programas\\Outros\\winrar\\winrar-x64-620br.exe",
-                "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\adobe_reader.exe",
                 "\\\\patrimar089\\e$\\Programas\\Outros\\Chrome\\ChromeSetup.exe"
         ]
-        install_popen(path[2])
-        intall_run([path[0], "/S"])
-        return intall_run([path[1], "/quiet"])
+        install_popen(path[1])
+        return intall_run([path[0], "/S"])
+    #função para instalar o adobe reader
+    if parametro == "adobe_reader":
+        original_file = "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\adobe_reader.exe"
+        copy_file = "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\adobe_reader_temp.exe"
+        shutil.copy(original_file, copy_file)
+        path = "\\\\patrimar089\\e$\\Programas\\Outros\\adobe_reader\\adobe_reader_temp.exe"
+        return install_popen(path, clicar=r"onde_clicar\bt_concluir.PNG", programa="Adobe Acrobat Reader DC Instalador")
     # Função para a instalação do sap_770
     if parametro == "sap770":
         path = "\\\\patrimar089\\e$\\\Programas\\\Outros\\\SAP_770\\SetupAll.exe"
-        return intall_run(path)
+        return install_popen(path, clicar=[r"onde_clicar\bt_sap_next.PNG", r"onde_clicar\bt_sap_checkbox.PNG", r"onde_clicar\bt_sap_next.PNG", r"onde_clicar\bt_sap_next.PNG", r"onde_clicar\bt_sap_next.PNG", r"onde_clicar\bt_sap_next.PNG", r"onde_clicar\bt_sap_next.PNG", r"onde_clicar\bt_sap_close.PNG"],programa="SAP Front End Installer", exept=r"onde_clicar\sap_instalado.PNG", cancel=r"onde_clicar\br_sap_cancel.PNG")
     # Função para a instalação do open_vpn
     if parametro == "open_vpn":
         path = "\\\\patrimar089\\e$\\Programas\\Outros\\VPN\\Open VPN\\OpenVPN-2.5.1-I601-amd64.msi"
@@ -98,7 +144,8 @@ def instalar_programas(parametro):
         # Função para a instalação do para o adaptador WIFI
     if parametro == "driver_wifi":
         path = "\\\\patrimar089\\e$\\Programas\\Outros\\Drivers\\Adaptador Wifi\\DWA-131_E1_V5.11b03\\Setup.exe"
-        return intall_run(path)
+        #return intall_run(path)
+        return install_popen(path, clicar=[r"onde_clicar\bt_setup.PNG", r"onde_clicar\bt_complete.PNG"])
     else:
         return "não encontrado"
 
@@ -114,7 +161,8 @@ class Interface(QDialog,QMainWindow):
         self.setGeometry(300, 300, 600, 150)
         #lista de programa para instalar salvos em dicionario chave =  parametro para ser instalado, valor =  nome do programa que será exibido para o usuario
         self.programas = {
-            "padrao":"Programas Padrão", 
+            "padrao":"Programas Padrão",
+            "adobe_reader":"Adobe Reader", 
             "driver_wifi":"Driver para Adaptador WIFI", 
             "sap770": "SAP Versão 770", 
             "open_vpn": "Open VPN", 
