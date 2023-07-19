@@ -13,15 +13,15 @@ import pygetwindow as gw
 def clicando(img=None,programa=None, exept=None, cancel=None):
     bt = pyautogui.locateOnScreen(img)
     if bt != None:
-        print(bt)
+        #print(bt)
         pyautogui.click(bt)
         return 1
     elif exept != None:
         if pyautogui.locateOnScreen(exept) != None:
-            print(exept)
+            #print(exept)
             if cancel != None:
                 if pyautogui.locateOnScreen(cancel) != None:
-                    print(cancel)
+                    #print(cancel)
                     pyautogui.click(cancel)
                     return 999
     return 0
@@ -48,7 +48,7 @@ def install_popen(path, clicar=None, programa=None, exept=None, cancel=None):
         while (install.poll() is None) or (etapa < len(clicar)):
             if (etapa < len(clicar)) == False:
                 break
-            print(clicar[etapa])
+            #print(clicar[etapa])
             etapa += clicando(clicar[etapa],programa, exept, cancel)
             contador_finalizar += 1
             if contador_finalizar >= 25*60:
@@ -168,6 +168,22 @@ def instalar_programas(parametro):
                                      ]
                                      
                                      )
+    if parametro == "bizagi":
+        path = r"\\patrimar089\e$\Programas\Outros\Bizagi\__bizagi__.exe"
+        install_popen(path, programa="Bizagi Modeler - InstallShieal Wizard",
+                      clicar=[
+                          r"onde_clicar\bizagi\bizagi-distra1.PNG",
+                          r"onde_clicar\bizagi\bt_bizagi_ok.PNG",
+                          r"onde_clicar\bizagi\bt_bizagi_avancar.PNG",
+                          r"onde_clicar\bizagi\bt_bizagi_aceitar.PNG",
+                          r"onde_clicar\bizagi\bt_bizagi_avancar2.PNG",
+                          r"onde_clicar\bizagi\bt_bizagi_avancar.PNG",
+                          r"onde_clicar\bizagi\bt_bizagi_avancar.PNG",
+                          r"onde_clicar\bizagi\bizagi-distra2.PNG",
+                          r"onde_clicar\bizagi\bt_bizagi_install.PNG",
+                          r"onde_clicar\bizagi\bt_bizagi_concluir.PNG"
+                      ]
+                      )
     else:
         return "não encontrado"
 
@@ -194,6 +210,7 @@ class Interface(QDialog,QMainWindow):
             "driver_hp": "Drive Video e Audio do HP G8 250 *Carregamento Demorado*", 
             "project" : "Project",
             "power_bi" : "Power BI", 
+            "bizagi" : "Bizagi", 
         }
         self.programas2 = {
             "totvs": "Instalar TOTVS"
