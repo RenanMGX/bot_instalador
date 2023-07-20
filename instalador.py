@@ -182,7 +182,8 @@ def instalar_programas(parametro):
                           r"onde_clicar\bizagi\bizagi-distra2.PNG",
                           r"onde_clicar\bizagi\bt_bizagi_install.PNG",
                           r"onde_clicar\bizagi\bt_bizagi_concluir.PNG"
-                      ]
+                          ],
+                           exept=r"onde_clicar\bizagi\bt_bizagi_desinstalar2.PNG", cancel=r"onde_clicar\bizagi\bt_bizagi_desinstalar2.PNG"
                       )
     else:
         return "não encontrado"
